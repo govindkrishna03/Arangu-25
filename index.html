@@ -100,13 +100,23 @@
     padding-right: 20px; /* Moves Points label inward */
 }
 @media (max-width: 768px) {
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 0;
+        margin: 0;
+    }
+
     .leaderboard-container {
         width: 90%;
         padding: 15px;
     }
 
     .leaderboard-title {
-        font-size: 1.2rem;
+        font-size: 1.8rem;
     }
 
     .leaderboard-entry {
