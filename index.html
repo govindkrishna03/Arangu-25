@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arts Festival Leaderboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            padding: 10px;
+            background: url('bg.png') no-repeat center center/cover;
+        }
+
+        .leaderboard-container {
+            max-width: 750px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-size: 2.4rem;
+            font-weight: 600;
+            color: black;
+            margin-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 1.1rem;
+        }
+
+        th {
+            background: black;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        tbody tr {
+            animation: fadeIn 0.7s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="leaderboard-container">
+        <img src="arangulogo.png" height="80px" style="margin-bottom: 10px;"/>   
+        <h2>🌟 Arangu'25 🌟</h2>
+        <h3>AMRITAKALOTSAVAM</h3>
+        <table id="leaderboard">
+            <thead>
+                <tr>
+                    <th>House</th>
+                    <th onclick="toggleSort()">Points 🔽</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        let ascending = false;
+
+        async function fetchLeaderboard() {
+            try {
+                const response = await fetch("https://backend-leaderboard.onrender.com/");
+                const data = await response.json();
+                
+                const houses = data.values[0];
+                const points = data.values[1].map(Number);
+
+                let leaderboardData = houses.map((house, index) => ({
+                    house,
+                    points: points[index]
+                })).sort((a, b) => b.points - a.points);
+
+                renderTable(leaderboardData);
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.querySelector("#leaderboard tbody");
+            tbody.innerHTML = "";
+            
+            const houseColors = {
+                "ANANDAMAYI": "#ff0000", 
+                "AMRITAMAYI": "#008000", 
+                "CHINMAYI": "#ffffff", 
+                "JYOTHIRMAYI": "#00a2ff"
+            };
+
+            data.forEach(entry => {
+                const row = document.createElement("tr");
+                const houseName = entry.house.toUpperCase();
+                const houseColor = houseColors[houseName] || "#ffffff";
+                
+                row.innerHTML = `
+                    <td style="background-color: ${houseColor}; color: ${houseName === 'CHINMAYI' ? 'black' : 'white'}; font-weight: bold;">${entry.house}</td>
+                    <td style="background-color: ${houseColor}; color: ${houseName === 'CHINMAYI' ? 'black' : 'white'}; font-weight: bold;">${entry.points}</td>`;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function toggleSort() {
+            ascending = !ascending;
+            const tbody = document.querySelector("#leaderboard tbody");
+            let rows = Array.from(tbody.querySelectorAll("tr"));
+
+            rows.sort((a, b) => {
+                let pointsA = parseInt(a.cells[1].textContent);
+                let pointsB = parseInt(b.cells[1].textContent);
+                return ascending ? pointsA - pointsB : pointsB - pointsA;
+            });
+
+            tbody.innerHTML = "";
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        fetchLeaderboard();
+        setInterval(fetchLeaderboard, 10000);
+    </script>
+</body>
+</html>
