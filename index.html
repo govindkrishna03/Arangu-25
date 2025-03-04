@@ -99,11 +99,46 @@
     flex: 1;
     padding-right: 20px; /* Moves Points label inward */
 }
+@media (max-width: 768px) {
+    .leaderboard-container {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .leaderboard-title {
+        font-size: 1.2rem;
+    }
+
+    .leaderboard-entry {
+        font-size: 1.1rem;
+        padding: 10px;
+    }
+
+    .house-icon {
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+    }
+
+    .header {
+        font-size: 1.2rem;
+        padding: 10px 20px;
+    }
+
+    .house-label {
+        padding-left: 10px;
+    }
+
+    .points-label {
+        padding-right: 10px;
+    }
+}
+
     </style>
 </head>
 <body>
     <div class="leaderboard-container">
-        <img src="arangulogo.png" height="80px" style="margin-bottom: 10px;"/>  
+        <img src="arangulogo.png" class="leaderboard-logo" height="80px" style="margin-bottom: 10px;"/>  
         <h2 class="leaderboard-title">🏆 Arangu'25 Leaderboard 🏆</h2>
         <div id="leaderboard"></div>
     </div>
