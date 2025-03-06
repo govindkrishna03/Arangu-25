@@ -53,34 +53,49 @@
 
     <script>
         async function fetchLeaderboard() {
-            try {
-                const response = await fetch("https://backend-leaderboard.onrender.com/");
-                const data = await response.json();
-                
-                let houses = data.houseData.values[0];
-                let points = data.houseData.values[1].map(Number);
+    try {
+        const response = await fetch("https://backend-leaderboard.onrender.com/");
+        const data = await response.json();
 
-                // Sort in descending order
-                let sortedData = houses.map((house, index) => ({ house, points: points[index] }))
-                                      .sort((a, b) => b.points - a.points);
-                
-                houses = sortedData.map(item => item.house);
-                points = sortedData.map(item => item.points);
+        let houses = data.houseData.values[0];
+        let points = data.houseData.values[1].map(Number);
 
-                updateCharts(houses, points);
-            } catch (error) {
-                console.error("Error fetching leaderboard:", error);
-            }
-        }
+        // Preserve original colors
+        let houseColors = {
+            "JYOTHIRMAYI": getGradientColors(barCtx, "#85caff", "#0072ff"),
+            "ANANDAMAYI": getGradientColors(barCtx, "#ff758c", "#ff7eb3"),
+            "AMRITAMAYI": getGradientColors(barCtx, "#42e695", "#3bb2b8"),
+            "CHINMAYI": getGradientColors(barCtx, "#e0e0e0", "#bababa")
+        };
 
-        function updateCharts(houses, points) {
-            barChart.data.labels = houses;
-            barChart.data.datasets[0].data = points;
-            barChart.update({
-                duration: 1000,  // Smooth transition for 1 second
-                easing: 'easeInOutQuad'
-            });
-        }
+        // Sort in descending order
+        let sortedData = houses.map((house, index) => ({
+            house,
+            points: points[index],
+            color: houseColors[house] // Keep house color
+        })).sort((a, b) => b.points - a.points);
+
+        houses = sortedData.map(item => item.house);
+        points = sortedData.map(item => item.points);
+        let colors = sortedData.map(item => item.color);
+
+        updateCharts(houses, points, colors);
+    } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+    }
+}
+
+function updateCharts(houses, points, colors) {
+    barChart.data.labels = houses;
+    barChart.data.datasets[0].data = points;
+    barChart.data.datasets[0].backgroundColor = colors;
+    barChart.update({
+        duration: 1000,  // Smooth transition for 1 second
+        easing: 'easeInOutQuad'
+    });
+}
+
+
 
         function getGradientColors(ctx, color1, color2) {
             let gradient = ctx.createLinearGradient(0, 0, 0, 400);
