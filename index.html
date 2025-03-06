@@ -220,7 +220,11 @@
 
         // Initial leaderboard fetch and set an interval to refresh every 10 seconds
         fetchLeaderboard();
-        setInterval(fetchLeaderboard, 10000);
+        setInterval(fetchLeaderboard, 5000);
+        setTimeout(() => {
+    window.location.href = "prizes.html";
+}, 20000); // 20 seconds
+
     </script>
 </body>
 </html>
