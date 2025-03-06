@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arangu'25 Trends</title>
+    <link rel="icon" type="image/png" href="arangulogo.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            padding: 20px;
+            color: black;
+        }
+        .charts-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .chart-container {
+            width: 80%;
+            max-width: 1000px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        .chart-container:hover {
+            transform: scale(1.05);
+        }
+        @media (max-width: 900px) {
+            .charts-container {
+                flex-direction: column;
+            }
+            .chart-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="charts-container">
+        <div class="chart-container">
+            <h3>House Points Comparison</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        async function fetchLeaderboard() {
+            try {
+                const response = await fetch("https://backend-leaderboard.onrender.com/");
+                const data = await response.json();
+                
+                let houses = data.houseData.values[0];
+                let points = data.houseData.values[1].map(Number);
+
+                // Sort in descending order
+                let sortedData = houses.map((house, index) => ({ house, points: points[index] }))
+                                      .sort((a, b) => b.points - a.points);
+                
+                houses = sortedData.map(item => item.house);
+                points = sortedData.map(item => item.points);
+
+                updateCharts(houses, points);
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+            }
+        }
+
+        function updateCharts(houses, points) {
+            barChart.data.labels = houses;
+            barChart.data.datasets[0].data = points;
+            barChart.update({
+                duration: 1000,  // Smooth transition for 1 second
+                easing: 'easeInOutQuad'
+            });
+        }
+
+        function getGradientColors(ctx, color1, color2) {
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            return gradient;
+        }
+
+        function getHouseColors(ctx) {
+            return [
+                getGradientColors(ctx, "#ff758c", "#ff7eb3"), 
+                getGradientColors(ctx, "#42e695", "#3bb2b8"),
+                getGradientColors(ctx, "#e0e0e0", "#bababa"),
+                getGradientColors(ctx, "#85caff", "#0072ff")
+            ];
+        }
+
+        const barCtx = document.getElementById("barChart").getContext("2d");
+        const barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Points',
+                    data: [],
+                    backgroundColor: getHouseColors(barCtx)
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false }
+                },
+                animation: {
+                    duration: 1000,  // Smooth transition for 1 second
+                    easing: 'easeInOutQuad'
+                }
+            }
+        });
+
+        fetchLeaderboard();
+        setInterval(fetchLeaderboard, 2000); // Refresh every 2 seconds
+        setTimeout(() => {
+    window.location.href = "prizes.html";
+}, 10000); // 20 seconds
+
+    </script>
+</body>
+</html>
