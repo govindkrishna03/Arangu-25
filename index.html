@@ -163,8 +163,8 @@
                 const response = await fetch("https://backend-leaderboard.onrender.com/");
                 const data = await response.json();
                 
-                const houses = data.values[0];
-                const points = data.values[1].map(Number);
+                const houses = data.houseData.values[0];
+                const points = data.houseData.values[1].map(Number);
 
                 let leaderboardData = houses.map((house, index) => ({
                     house,
@@ -220,7 +220,7 @@
 
         // Initial leaderboard fetch and set an interval to refresh every 10 seconds
         fetchLeaderboard();
-        setInterval(fetchLeaderboard, 5000);
+        setInterval(fetchLeaderboard, 10000);
         setTimeout(() => {
     window.location.href = "prizes.html";
 }, 20000); // 20 seconds
