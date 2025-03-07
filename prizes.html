@@ -108,69 +108,77 @@
         let allResults = [];
         let currentIndex = 0;
         const entriesPerPage = 8;
-        const updateInterval = 10000; // Change every 5 seconds
+        const updateInterval = 5000; // Change every 5 seconds
     
-        async function fetchResults() {
-            try {
-                const response = await fetch("https://backend-leaderboard.onrender.com/");
-                const data = await response.json();
-                
-                allResults = data.scoreData.values.slice(1); // Skip header row
-    
-                // Sort results: First by event, then by position
-                allResults.sort((a, b) => {
-                    if (a[0] === b[0]) {
-                        return parseInt(a[2]) - parseInt(b[2]); // Sort by position
-                    }
-                    return a[0].localeCompare(b[0]); // Sort by event name
-                });
-    
-                displayResults();
-            } catch (error) {
-                console.error("Error fetching event results:", error);
+        async function fetchAndDisplayResults() {
+    try {
+        const response = await fetch("https://backend-leaderboard.onrender.com/");
+        const data = await response.json();
+        
+        allResults = data.scoreData.values.slice(1); // Skip header row
+
+        // Sort results: First by event, then by position
+        allResults.sort((a, b) => {
+            if (a[0] === b[0]) {
+                return parseInt(a[2]) - parseInt(b[2]); // Sort by position
             }
-        }
-    
-        function displayResults() {
-            const resultsBody = document.getElementById("resultsBody");
-            resultsBody.innerHTML = ""; // Clear previous entries
-    
-            // Get the next set of entries (looping back when reaching the end)
-            const visibleEntries = allResults.slice(currentIndex, currentIndex + entriesPerPage);
-            if (visibleEntries.length < entriesPerPage) {
-                // If we don't have enough entries, take the remaining ones from the start
-                visibleEntries.push(...allResults.slice(0, entriesPerPage - visibleEntries.length));
-            }
-    
-            visibleEntries.forEach(row => {
-                const [event, name, position, house, points] = row;
-                const newRow = document.createElement("tr");
-                newRow.className = "fade-in";
-    
-                let houseClass = "";
-                if (house.toLowerCase().includes("anandamayi")) houseClass = "house-anandamayi";
-                else if (house.toLowerCase().includes("amritamayi")) houseClass = "house-amritamayi";
-                else if (house.toLowerCase().includes("chinmayi")) houseClass = "house-chinmayi";
-                else if (house.toLowerCase().includes("jyothirmayi")) houseClass = "house-jyothirmayi";
-    
-                newRow.innerHTML = `
-                    <td>${event}</td>
-                    <td>${name}</td>
-                    <td>${position}</td>
-                    <td class="${houseClass}">${house}</td>
-                `;
-    
-                resultsBody.appendChild(newRow);
-            });
-    
-            // Move to the next batch
-            currentIndex = (currentIndex + entriesPerPage) % allResults.length;
-        }
-    
-        fetchResults();
-        setInterval(displayResults, updateInterval);
-        setInterval(fetchResults, 10000);
-        setTimeout(() => {
+            return a[0].localeCompare(b[0]); // Sort by event name
+        });
+
+        // Reset index to cycle smoothly
+        currentIndex = 0;
+        displayResults();
+    } catch (error) {
+        console.error("Error fetching event results:", error);
+    }
+}
+
+function displayResults() {
+    const resultsBody = document.getElementById("resultsBody");
+    resultsBody.innerHTML = ""; // Clear previous entries
+
+    if (allResults.length === 0) return; // Prevent errors if no data
+
+    // Get the next set of entries (looping back when reaching the end)
+    const visibleEntries = allResults.slice(currentIndex, currentIndex + entriesPerPage);
+    if (visibleEntries.length < entriesPerPage) {
+        visibleEntries.push(...allResults.slice(0, entriesPerPage - visibleEntries.length));
+    }
+
+    visibleEntries.forEach(row => {
+        const [event, name, position, house] = row;
+        const newRow = document.createElement("tr");
+        newRow.className = "fade-in";
+
+        let houseClass = "";
+        if (house.toLowerCase().includes("anandamayi")) houseClass = "house-anandamayi";
+        else if (house.toLowerCase().includes("amritamayi")) houseClass = "house-amritamayi";
+        else if (house.toLowerCase().includes("chinmayi")) houseClass = "house-chinmayi";
+        else if (house.toLowerCase().includes("jyothirmayi")) houseClass = "house-jyothirmayi";
+
+        newRow.innerHTML = `
+            <td>${event}</td>
+            <td>${name}</td>
+            <td>${position}</td>
+            <td class="${houseClass}">${house}</td>
+        `;
+
+        resultsBody.appendChild(newRow);
+    });
+
+    // Move to the next batch
+    currentIndex = (currentIndex + entriesPerPage) % allResults.length;
+}
+
+// Fetch new results every 30 seconds to stay updated
+fetchAndDisplayResults();
+setInterval(fetchAndDisplayResults, 30000); 
+
+// Update display every 10 seconds
+setInterval(displayResults, updateInterval);
+
+// Redirect to index.html after 50 seconds
+setTimeout(() => {
     window.location.href = "index.html";
 }, 50000);
 
