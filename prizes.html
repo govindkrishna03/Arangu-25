@@ -108,16 +108,23 @@
         let allResults = [];
         let currentIndex = 0;
         const entriesPerPage = 8;
-        const updateInterval = 10000; // Change every 5 seconds
+        const updateInterval = 5000; // Change every 5 seconds
     
         async function fetchAndDisplayResults() {
     try {
         const response = await fetch("https://backend-leaderboard.onrender.com/");
         const data = await response.json();
         
+        allResults = data.scoreData.values.slice(1); // Skip header row
 
-
-        allResults = data.scoreData.values.slice(1).reverse(); 
+        // Sort by event (descending order) and then by position (ascending order)
+        allResults.sort((a, b) => {
+            const eventComparison = b[0].localeCompare(a[0]);  // descending order for event
+            if (eventComparison !== 0) {
+                return eventComparison;
+            }
+            return parseInt(a[2]) - parseInt(b[2]); // ascending order for position
+        });
 
         // Reset index to cycle smoothly
         currentIndex = 0;
