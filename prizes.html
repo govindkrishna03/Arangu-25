@@ -108,7 +108,7 @@
         let allResults = [];
         let currentIndex = 0;
         const entriesPerPage = 8;
-        const updateInterval = 5000; // Change every 5 seconds
+        const updateInterval = 10000; // Change every 5 seconds
     
         async function fetchResults() {
             try {
@@ -169,6 +169,7 @@
     
         fetchResults();
         setInterval(displayResults, updateInterval);
+        setInterval(fetchResults, 10000);
         setTimeout(() => {
     window.location.href = "index.html";
 }, 50000);
