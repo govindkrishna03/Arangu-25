@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arangu'25 Leaderboard</title>
+    <title>Arangu'25 Results</title>
     <link rel="icon" type="image/png" href="arangulogo.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
@@ -13,13 +13,10 @@
             text-align: center;
             background: url('bg.png') no-repeat center center fixed;
             background-size: cover;
-            position: relative;
             padding: 20px;
-            overflow-y: hidden;
-
         }
 
-        .leaderboard-container {
+        .container {
             max-width: 800px;
             margin: auto;
             padding: 20px;
@@ -28,203 +25,37 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .leaderboard-title {
+        .title {
             font-size: 2.5rem;
             font-weight: 700;
             color: black;
         }
 
-        .leaderboard-entry {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            margin: 10px 0; /* Added gap between each house */
-            border-radius: 50px;
-            font-size: 1.3rem;
+        .download-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            font-size: 1.2rem;
             font-weight: bold;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            color: white;
+            background: #007BFF;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
         }
 
-        .leaderboard-entry:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        .download-btn:hover {
+            background: #0056b3;
         }
-
-        .house-name {
-            display: flex;
-            align-items: center;
-            color: black;
-        }
-
-        .house-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 15px;
-        }
-
-        .top-rank {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: black;
-        }
-
-        /* Different colors for houses */
-        .anandamayi { background: #ff9999; } /* Light Red */
-        .amritamayi { background: #99e699; } /* Light Green */
-        .chinmayi { background: #e0e0e0; }  /* Light Gray */
-        .jyothirmayi { background: #99ccff; } /* Light Blue */
-
-        /* Styling for header labels */
-        .header {
-    font-size: 1.4rem;
-    font-weight: bold;
-    background: #000;
-    color: white;
-    padding: 15px 30px; /* Added padding for spacing */
-    display: flex;
-    justify-content: space-between;
-    border-radius: 12px;
-}
-
-.house-label {
-    text-align: left;
-    flex: 1;
-    padding-left: 20px; /* Moves House label inward */
-}
-
-.points-label {
-    text-align: right;
-    flex: 1;
-    padding-right: 20px; /* Moves Points label inward */
-}
-@media (max-width: 900px) {
-    body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 0;
-        margin: 0;
-    }
-
-    .leaderboard-container {
-        width: 90%;
-        padding: 15px;
-        margin-top: 200px;
-        
-    }
-
-    .leaderboard-title {
-        font-size: 1.3rem;
-    }
-
-    .leaderboard-entry {
-        font-size: 1.1rem;
-        padding: 10px;
-    }
-
-    .house-icon {
-        width: 30px;
-        height: 30px;
-        margin-right: 10px;
-    }
-
-    .header {
-        font-size: 1rem;
-        padding: 10px 20px;
-    }
-
-    .house-label {
-        padding-left: 10px;
-    }
-
-    .points-label {
-        padding-right: 10px;
-    }
-}
-
     </style>
 </head>
 <body>
-    <div class="leaderboard-container">
-        <img src="arangulogo.png" class="leaderboard-logo" height="80px" style="margin-bottom: 10px;"/>  
-        <h2 class="leaderboard-title">🏆 Arangu'25 Leaderboard 🏆</h2>
-        <div id="leaderboard"></div>
+    <div class="container">
+        <img src="arangulogo.png" height="80px" style="margin-bottom: 10px;"/>  
+        <h2 class="title">🏆 Arangu'25 Results 🏆</h2>
+        <p>View and download the official results of Arangu'25.</p>
+        <a href="ARANGU_RESULTS.pdf" class="download-btn" download>Download Now</a>
     </div>
-
-    <script>
-        async function fetchLeaderboard() {
-            try {
-                const response = await fetch("https://backend-leaderboard.onrender.com/");
-                const data = await response.json();
-                
-                const houses = data.houseData.values[0];
-                const points = data.houseData.values[1].map(Number);
-
-                let leaderboardData = houses.map((house, index) => ({
-                    house,
-                    points: points[index]
-                })).sort((a, b) => b.points - a.points);
-
-                renderLeaderboard(leaderboardData);
-            } catch (error) {
-                console.error("Error fetching leaderboard:", error);
-            }
-        }
-
-        function renderLeaderboard(data) {
-            const leaderboard = document.querySelector("#leaderboard");
-
-            // Clear existing leaderboard entries before adding new ones
-            leaderboard.innerHTML = "";
-
-            // Add leaderboard header row
-            leaderboard.innerHTML += `
-                <div class="leaderboard-entry header">
-                    <span class="house-label">House</span>
-                    <span class="points-label">Points</span>
-                </div>
-            `;
-
-            // Add leaderboard entries dynamically
-            data.forEach((entry, index) => {
-                const div = document.createElement("div");
-                div.className = `leaderboard-entry ${getHouseClass(entry.house)}`;
-
-                div.innerHTML = `
-                    <div class="house-name">
-                        <img src="arangulogo.png" class="house-icon" alt="${entry.house}">
-                        ${index < 3 ? `<span class="top-rank">${entry.house}</span>` : entry.house}
-                    </div>
-                    <div>${entry.points}</div>
-                `;
-
-                leaderboard.appendChild(div);
-            });
-        }
-
-        function getHouseClass(house) {
-            switch (house.toLowerCase()) {
-                case "anandamayi": return "anandamayi";
-                case "amritamayi": return "amritamayi";
-                case "chinmayi": return "chinmayi";
-                case "jyothirmayi": return "jyothirmayi";
-                default: return "";
-            }
-        }
-
-        // Initial leaderboard fetch and set an interval to refresh every 10 seconds
-        fetchLeaderboard();
-        setInterval(fetchLeaderboard, 10000);
-        setTimeout(() => {
-    window.location.href = "trends.html";
-}, 20000); // 20 seconds
-
-    </script>
 </body>
 </html>
